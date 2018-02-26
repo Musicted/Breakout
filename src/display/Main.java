@@ -12,6 +12,8 @@ import util.Vector2d;
 public class Main extends GraphicsProgram {
 	private static final int WIDTH = 560;
 	private static final int HEIGHT = 280;
+	private static final int FPS = 60;
+	private static final long FRAMETIME = 1_000_000_000 / FPS; // nanoseconds
 	
 	private GameLogic gameLogic = new GameLogic();
 	private GRect ball;
@@ -30,14 +32,17 @@ public class Main extends GraphicsProgram {
 	
 	private void mainLoop() {
 		long timer = System.nanoTime();
+		long lastFrame = System.nanoTime();
 		
 		
 		while (true) {
 			gameLogic.cycle(System.nanoTime() - timer);
 			timer = System.nanoTime();
 			
-			display();
-			// TODO limit time between display updates
+			if (System.nanoTime() - lastFrame > FRAMETIME) {
+				display();
+				lastFrame = System.nanoTime();
+			}
 		}
 		
 	}
@@ -62,7 +67,6 @@ public class Main extends GraphicsProgram {
 		for (int col = 0; col < blocks.length; col++) {
 			for (int row = 0; row < blocks[col].length; row++) {
 				blockReps[col][row].setFillColor(blocks[col][row].getColor());
-//				blockReps[col][row].setFillColor(Color.cyan);
 			}
 		}
 		repaint();
