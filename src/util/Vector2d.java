@@ -31,4 +31,10 @@ public class Vector2d {
 	public Vector2d reflectY() {
 		return new Vector2d(x, -y);
 	}
+	
+	public Vector2d rotate(double radians) {
+		double xNew = x * Math.cos(radians) - y * Math.sin(radians);
+		double yNew = y * Math.cos(radians) + x * Math.sin(radians);
+		return new Vector2d(xNew, yNew);
+	}
 }
