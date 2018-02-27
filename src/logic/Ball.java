@@ -64,4 +64,9 @@ public class Ball {
 	public double getLowerY() {
 		return pos.getY() + size;
 	}
+	
+	public void speedUp(double factor) {
+		speed = speed.scale(factor);
+	}
+	
 }

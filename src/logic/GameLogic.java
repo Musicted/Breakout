@@ -8,17 +8,27 @@ public class GameLogic {
 	private static final int WIDTH = 560; // Block width: 40
 	private static final int HEIGHT = 280; // Block height: 20
 	private static final double[] XSPEEDS = { -0.5, 0.5, -0.3, 0.3, -0.7, 0.7 };
+	private static RandomGenerator rand = new RandomGenerator();
+	private static double speedFactor = 200_000.0; // used internally for slowing or speeding up the game
 
-	private RandomGenerator rand = new RandomGenerator();
 	private Ball ball = new Ball(new Vector2d(280, 140), new Vector2d(0.5, 0.3));
 	private Paddle paddle = new Paddle();
 	private Board board = new Board();
-	private double speedFactor = 200_000.0; // used internally for slowing or speeding up the game
 
 	private boolean isRunning;
 
 	public GameLogic() {
 		isRunning = false;
+		ball = new Ball(new Vector2d(280, 140), new Vector2d(0.5, 0.3));
+		paddle = new Paddle();
+		board = new Board();
+	}
+	
+	public GameLogic(int level) {
+		isRunning = false;
+		ball = new Ball(new Vector2d(280, 140), new Vector2d(0.5, 0.3));
+		paddle = new Paddle();
+		board = new Board(Levels.LVL[level]);
 	}
 
 	public void go() {
@@ -72,6 +82,10 @@ public class GameLogic {
 		if (ball.getRightX() > paddle.getXPos() && ball.getLowerY() > HEIGHT - paddle.getHeight()) {
 			if (ball.getLeftX() < paddle.getXPos() + paddle.getWidth() && ball.getSpeed().getY() > 0) {
 				ball.reflectY();
+				double ballMiddle = (ball.getRightX() + ball.getLeftX()) / 2;
+				double paddleMiddle = paddle.getXPos() + paddle.getWidth() / 2;
+				ball.setSpeed(ball.getSpeed().rotate((ballMiddle - paddleMiddle) / paddle.getWidth()));
+				ball.speedUp(1.01);
 			}
 		}
 
@@ -96,7 +110,7 @@ public class GameLogic {
 		if (reflected) {
 			hasReflected = true;
 		}
-		reflected = collideCorner(rightX, lowerY, hasReflected);
+		collideCorner(rightX, lowerY, hasReflected);
 
 	}
 
