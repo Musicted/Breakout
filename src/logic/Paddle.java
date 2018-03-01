@@ -1,7 +1,7 @@
 package logic;
 
 public class Paddle {
-	private final double WIDTH = 70;
+	private final double WIDTH = 100;
 	private final double HEIGHT = 20;
 	private double xPos;
 	

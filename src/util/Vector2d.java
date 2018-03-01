@@ -37,4 +37,8 @@ public class Vector2d {
 		double yNew = y * Math.cos(radians) + x * Math.sin(radians);
 		return new Vector2d(xNew, yNew);
 	}
+	
+	public double abs() {
+		return Math.sqrt(x * x + y * y);
+	}
 }

@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import javax.management.InvalidAttributeValueException;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -17,11 +18,8 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.eclipse.jetty.websocket.common.WebSocketSession;
-import org.eclipse.jetty.websocket.common.message.MessageOutputStream;
 import org.msgpack.core.MessageBufferPacker;
 import org.msgpack.core.MessagePack;
-import org.msgpack.core.MessagePacker;
 
 /**
  * This class wraps the network communication with the lighthouse in a simple
@@ -56,8 +54,8 @@ public class LighthouseDisplay {
 
 	/**
 	 * Connects to the lighthouse server with the default web-socket address
-	 * "wss://lighthouse.uni-kiel.de/user/<username>/model" and Certificate
-	 * checking disabled (since it's self-signed)
+	 * "wss://lighthouse.uni-kiel.de/user/<username>/model" and Certificate checking
+	 * disabled (root CA unknown)
 	 * 
 	 * @throws InvalidAttributeValueException
 	 *             if "username" is invalid for creating a connection
@@ -142,11 +140,11 @@ public class LighthouseDisplay {
 	}
 
 	/**
-	 * Sends a packet of data to the lighthouse server. Usually the data should
-	 * be a byte array consisting of 1176 bytes. The first three bytes are the
-	 * red, green and blue color values of the first window. The windows start
-	 * at the top-left corner. If less bytes are sent, only the first windows
-	 * are updated. The next transmission starts at the first window again.
+	 * Sends a packet of data to the lighthouse server. Usually the data should be a
+	 * byte array consisting of 1176 bytes. The first three bytes are the red, green
+	 * and blue color values of the first window. The windows start at the top-left
+	 * corner. If less bytes are sent, only the first windows are updated. The next
+	 * transmission starts at the first window again.
 	 *
 	 * @param data
 	 *            The data to send
@@ -186,8 +184,6 @@ public class LighthouseDisplay {
 		private LighthouseDisplay parent;
 		private Session session;
 		private boolean connected = false;
-		private MessageOutputStream mos;
-		private MessagePacker packer;
 		private int debug;
 
 		private LighthouseDisplayHandler(LighthouseDisplay parent, int debug) {
@@ -196,8 +192,7 @@ public class LighthouseDisplay {
 		}
 
 		/**
-		 * this method sends the given data as a lighthouse request to the
-		 * server
+		 * this method sends the given data as a lighthouse request to the server
 		 * 
 		 * @param data
 		 *            the data to send
@@ -214,7 +209,7 @@ public class LighthouseDisplay {
 				// {
 				// "VERB" => String // (GET, PUT, STREAM)
 				// "PATH" => [String] // (["user",<username>,"model"])
-				// "AUTH" => {"NAME" => String, "TOKEN" => (Byte-)String}
+				// "AUTH" => {"USER" => String, "TOKEN" => String}
 				// "META" => {* => *}
 				// "PAYL" => *
 				// "REID" => Int // Request-ID
@@ -239,7 +234,7 @@ public class LighthouseDisplay {
 					packer.packString("AUTH");
 					packer.packMapHeader(2);
 					{
-						packer.packString("NAME");
+						packer.packString("USER");
 						packer.packString(parent.getUsername());
 
 						packer.packString("TOKEN");
@@ -247,16 +242,15 @@ public class LighthouseDisplay {
 					}
 
 					packer.packString("META");
-					packer.packNil();
+					packer.packMapHeader(0);
 
 					packer.packString("PAYL");
 					packer.packBinaryHeader(length);
 					packer.addPayload(data, offset, length);
 				}
-				session.getRemote().sendBytes(ByteBuffer.wrap(packer.toByteArray()));
-				// packer.flush();
-				// mos.flush();
-				// session.getRemote().flush();
+				RemoteEndpoint endpoint = session.getRemote();
+				endpoint.sendBytes(ByteBuffer.wrap(packer.toByteArray()));
+				endpoint.flush();
 			}
 		}
 
@@ -297,18 +291,6 @@ public class LighthouseDisplay {
 		public void onConnect(Session session) {
 			// save session for usage in communication
 			this.session = session;
-			// create a MessagePack packer to send MessagePack data on this
-			// web-socket
-			if (packer != null) {
-				try {
-					// just to be sure, this old one can be garbage collected
-					packer.close();
-				} catch (IOException e) {
-				}
-			}
-			mos = new MessageOutputStream((WebSocketSession) session);
-			packer = MessagePack.newDefaultPacker(mos);
-
 			connected = true;
 			if (debug > 0) {
 				System.out.printf("LighthouseDisplay, Got connection: %s%n", session);
