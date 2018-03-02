@@ -10,7 +10,7 @@ public class GameLogic {
 	private static final int HEIGHT = 280; // Block height: 20
 	
 	private RandomGenerator rand = new RandomGenerator();
-	private double speedFactor = 200_000.0; // used internally for slowing or speeding up the game
+	private double speedFactor = 1_000_000.0; // used internally for slowing or speeding up the game
 	private Ball ball;
 	private Paddle paddle;
 	private Board board;

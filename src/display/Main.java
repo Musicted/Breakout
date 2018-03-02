@@ -70,10 +70,12 @@ public class Main extends GraphicsProgram {
 		long timer = System.nanoTime();
 		long lastFrame = System.nanoTime();
 		long lastLHFrame = System.nanoTime();
+		long tmpTimer;
 
 		while (true) {
+			tmpTimer = System.nanoTime();
 			gameLogic.cycle(System.nanoTime() - timer);
-			timer = System.nanoTime();
+			timer = tmpTimer;
 
 			if (System.nanoTime() - lastFrame > FRAMETIME) {
 				display();
@@ -81,7 +83,9 @@ public class Main extends GraphicsProgram {
 			}
 
 			if (useLighthouse && System.nanoTime() - lastLHFrame > FRAMETIME_LH) {
-				displayLighthouse();
+//				displayLighthouse();
+				LighthouseDisplayThread t = new LighthouseDisplayThread(gameLogic, disp);
+				t.start();
 				lastLHFrame = System.nanoTime();
 			}
 		}
