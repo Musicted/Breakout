@@ -96,53 +96,94 @@ public class GameLogic {
 				double deflectionFactor = 2 * (ballMiddle - paddleMiddle) / paddle.getWidth();
 				speed = speed.rotate(deflectionFactor * FORTYFIVE);
 				ball.setSpeed(speed);
+				// It's like those YouTube videos
+				// BREAKOUT BUT EVERYTIME THE BALL HITS THE PADDLE IT SPEEDS UP 1%
 				ball.speedUp(1.01);
 			}
 		}
-
 		/* Block Collisions */
 		double leftX = ball.getLeftX() / 40;
+		int leftXF = (int) Math.floor(leftX);
 		double rightX = ball.getRightX() / 40;
+		int rightXF = (int) Math.floor(rightX);
 		double upperY = ball.getUpperY() / 20;
+		int upperYF = (int) Math.floor(upperY);
 		double lowerY = ball.getLowerY() / 20;
-
-		boolean hasReflected = false;
-		boolean reflected;
-
-		reflected = collideCorner(leftX, upperY, hasReflected);
-		if (reflected) {
-			hasReflected = true;
+		int lowerYF = (int) Math.floor(lowerY);
+		
+		// top collision
+		if (ball.getSpeed().getY() < 0) {
+			boolean reflected = false;
+			if (collideCorner(leftXF, upperYF)) {
+				reflected = true;
+				board.destroyBlock(leftXF, upperYF);
+			}
+			if (collideCorner(rightXF, upperYF)) {
+				reflected = true;
+				board.destroyBlock(rightXF, upperYF);
+			}
+			if (reflected) {
+				ball.reflectY();
+			}
+		} else {
+			// bottom collision
+			boolean reflected = false;
+			if (collideCorner(leftXF, lowerYF)) {
+				reflected = true;
+				board.destroyBlock(leftXF, lowerYF);
+			}
+			if (collideCorner(rightXF, lowerYF)) {
+				reflected = true;
+				board.destroyBlock(rightXF, lowerYF);
+			}
+			if (reflected) {
+				ball.reflectY();
+			}
 		}
-		reflected = collideCorner(rightX, upperY, hasReflected);
-		if (reflected) {
-			hasReflected = true;
+		// left collision
+		if (ball.getSpeed().getX() < 0) {
+			boolean reflected = false;
+			if (collideCorner(leftXF, upperYF)) {
+				reflected = true;
+				board.destroyBlock(leftXF, upperYF);
+			}
+			if (collideCorner(leftXF, lowerYF)) {
+				reflected = true;
+				board.destroyBlock(leftXF, lowerYF);
+			}
+			if (reflected) {
+				ball.reflectX();
+			}
+		} else {
+			// right collision
+			boolean reflected = false;
+			if (collideCorner(rightXF, upperYF)) {
+				reflected = true;
+				board.destroyBlock(rightXF, upperYF);
+			}
+			if (collideCorner(rightXF, lowerYF)) {
+				reflected = true;
+				board.destroyBlock(rightXF, lowerYF);
+			}
+			if (reflected) {
+				ball.reflectX();
+			}
 		}
-		reflected = collideCorner(leftX, lowerY, hasReflected);
-		if (reflected) {
-			hasReflected = true;
-		}
-		collideCorner(rightX, lowerY, hasReflected);
+		
 
 	}
 
-	private boolean collideCorner(double x, double y, boolean hasReflected) {
-		int xF = (int) Math.floor(x);
-		int yF = (int) Math.floor(y);
-		if (xF >= 0 && xF < board.getBlocks().length) {
-			if (yF >= 0 && yF < board.getBlocks().length) {
-				if (board.getBlocks()[xF][yF].getClass() != new NoBlock().getClass()) {
-					if (x - xF < y - yF && !hasReflected) {
-						ball.reflectY();
-					} else if (!hasReflected) {
-						ball.reflectX();
-					}
-					board.destroyBlock(xF, yF);
+	private boolean collideCorner(int x, int y) {
+		if (x >= 0 && x < board.getBlocks().length) {
+			if (y >= 0 && y < board.getBlocks().length) {
+				if (board.getBlocks()[x][y].getClass() != new NoBlock().getClass()) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
+	
 
 	public void movePaddle(double x) {
 		if (x < 0) {

@@ -62,7 +62,7 @@ public class Main extends GraphicsProgram {
 			}
 			pause(1000);
 		}
-		gameLogic = new GameLogic();
+		gameLogic = new GameLogic(0);
 		mainLoop();
 	}
 
@@ -134,7 +134,7 @@ public class Main extends GraphicsProgram {
 		add(ball);
 
 		paddle = new GRect(-500, HEIGHT - 20, gameLogic.getPaddleData()[1], 20);
-		paddle.setFillColor(Color.RED);
+		paddle.setFillColor(Color.WHITE);
 		paddle.setFilled(true);
 		add(paddle);
 
