@@ -27,7 +27,7 @@ public class Main extends GraphicsProgram {
 	private LighthouseDisplay disp;
 
 	public void init() {
-		if (readBoolean("Use Lighthouse API? [true/false] ")) {
+		/*if (readBoolean("Use Lighthouse API? [true/false] ")) {
 			useLighthouse = true;
 			String uname = readLine("Username: ");
 			String token = readLine("Token: ");
@@ -46,15 +46,16 @@ public class Main extends GraphicsProgram {
 			}
 			println("Connected!");
 			
-		}
+		}*/
 
 		setSize(WIDTH, HEIGHT);
 		addMouseListeners();
 		initGFX();
 	}
-
-	public void run() {
-		for (int[][] screen : Levels.INTRO) {
+	
+	public void showText(int[][][] text) {
+		
+		for (int[][] screen : text) {
 			gameLogic = new GameLogic(screen);
 			display();
 			if (useLighthouse) {
@@ -62,6 +63,12 @@ public class Main extends GraphicsProgram {
 			}
 			pause(1000);
 		}
+		
+	}
+
+	public void run() {
+
+		showText(Levels.INTRO);
 		gameLogic = new GameLogic(0);
 		mainLoop();
 	}
@@ -76,6 +83,24 @@ public class Main extends GraphicsProgram {
 			tmpTimer = System.nanoTime();
 			gameLogic.cycle(System.nanoTime() - timer);
 			timer = tmpTimer;
+			
+			// Game over
+			if (gameLogic.getDeathState() == true) {
+				
+				showText(Levels.GAMEOVER);
+				gameLogic = new GameLogic(0);
+				
+			}
+			
+			// Level completed
+			if (gameLogic.getLevelCompleteState() == true) {
+				if (gameLogic.getNextLevel() < Levels.LVL.length) {
+					gameLogic = new GameLogic(gameLogic.getNextLevel());
+				} else {
+					showText(Levels.YOU_WIN);
+					gameLogic = new GameLogic(0);
+				}
+			}
 
 			if (System.nanoTime() - lastFrame > FRAMETIME) {
 				display();

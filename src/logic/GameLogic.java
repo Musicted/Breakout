@@ -9,6 +9,10 @@ public class GameLogic {
 	private static final int WIDTH = 560; // Block width: 40
 	private static final int HEIGHT = 280; // Block height: 20
 	
+	public static final int RANDOMCOLOR = 0;
+	public static final int LETTERCOLOR = 1;
+	public static final int ROWSCOLOR = 2;
+	
 	private RandomGenerator rand = new RandomGenerator();
 	private double speedFactor = 1_000_000.0; // used internally for slowing or speeding up the game
 	private Ball ball;
@@ -16,6 +20,10 @@ public class GameLogic {
 	private Board board;
 
 	private boolean isRunning;
+	
+	private int lifeCount = 3;
+	private int currentLevel;
+	private boolean levelCompleted = false;
 
 	public GameLogic() {
 		isRunning = false;
@@ -26,9 +34,10 @@ public class GameLogic {
 	
 	public GameLogic(int level) {
 		isRunning = false;
+		currentLevel = level;
 		ball = new Ball(new Vector2d(280, 140), new Vector2d(0, 0));
 		paddle = new Paddle();
-		board = new Board(Levels.LVL[level]);
+		board = new Board(Levels.LVL[level], ROWSCOLOR);
 	}
 	
 	public GameLogic(int[][] screen) {
@@ -36,7 +45,7 @@ public class GameLogic {
 		ball = new Ball(new Vector2d(-500, -500), new Vector2d(0, 0));
 		paddle = new Paddle();
 		paddle.setPos(-500);
-		board = new Board(screen);
+		board = new Board(screen, LETTERCOLOR);
 	}
 
 	public void go() {
@@ -69,6 +78,18 @@ public class GameLogic {
 		double[] data = { paddle.getXPos(), paddle.getWidth(), paddle.getHeight() };
 		return data;
 	}
+	
+	public boolean getDeathState() {
+		return (lifeCount == 0);
+	}
+	
+	public boolean getLevelCompleteState() {
+		return levelCompleted;
+	}
+	
+	public int getNextLevel() {
+		return currentLevel + 1;
+	}
 
 	private void detectCollisions() {
 		/* Left/right screen borders */
@@ -82,7 +103,12 @@ public class GameLogic {
 			ball.reflectY();
 			System.out.println("u ded.");
 			isRunning = false;
-			// TODO subtract life
+			if (lifeCount > 0) {
+				lifeCount--;
+			} else {
+				// TODO
+				// Game over
+			}
 		} else if (ball.getUpperY() < 0 && ball.getSpeed().getY() < 0) {
 			ball.reflectY();
 		}
@@ -168,6 +194,14 @@ public class GameLogic {
 			if (reflected) {
 				ball.reflectX();
 			}
+		}
+		
+		// Level complete
+		if (board.isBoardEmpty()) {
+			isRunning = false;
+			levelCompleted = true;
+			System.out.println("Level complete");
+			// TODO Display next Level
 		}
 		
 
