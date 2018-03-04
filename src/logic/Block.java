@@ -19,7 +19,7 @@ public class Block {
 		return color;
 	}
 	
-	private static Color randomColor() {
+	public static Color randomColor() {
 		RandomGenerator rand = new RandomGenerator();
 		int choice = rand.nextInt(3);
 		switch (choice) {
