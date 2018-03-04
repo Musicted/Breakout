@@ -27,7 +27,7 @@ public class Main extends GraphicsProgram {
 	private LighthouseDisplay disp;
 
 	public void init() {
-		/*if (readBoolean("Use Lighthouse API? [true/false] ")) {
+		if (readBoolean("Use Lighthouse API? [true/false] ")) {
 			useLighthouse = true;
 			String uname = readLine("Username: ");
 			String token = readLine("Token: ");
@@ -46,7 +46,7 @@ public class Main extends GraphicsProgram {
 			}
 			println("Connected!");
 			
-		}*/
+		}
 
 		setSize(WIDTH, HEIGHT);
 		addMouseListeners();
