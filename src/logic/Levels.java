@@ -1,6 +1,15 @@
 package logic;
 
+/**
+ * Container for all levels and text screens.
+ * 
+ * All members are 3D-int-Arrays.
+ * The innermost Arrays contain an x-y coordinate-pair, representing the position of a block.
+ * The middle layer groups these blocks as levels.
+ * The outer layer groups levels as a level pack.
+ */
 public class Levels {
+	// The levels that the player is supposed to play
 	public static final int[][][] LVL = {
 			{
 				{0, 0}, {2, 0}, {4, 0}, {6, 0}, {8, 0}, {10, 0}, {12, 0}, 
@@ -35,7 +44,7 @@ public class Levels {
 			}
 			
 	};
-
+	// Intro screen
 	public static final int[][][] INTRO = { {
 			// B
 			{ 5, 2 }, { 6, 2 }, { 7, 2 }, { 5, 3 }, { 8, 3 }, { 5, 4 }, { 8, 4 }, { 5, 5 }, { 8, 5 }, { 5, 6 },
@@ -82,7 +91,7 @@ public class Levels {
 			}
 
 	};
-
+	// Game over screen
 	public static final int[][][] GAMEOVER = { {
 			// G
 			{ 6, 2 }, { 7, 2 }, { 8, 2 }, { 5, 3 }, { 5, 4 }, { 5, 5 }, { 5, 6 }, { 7, 6 }, { 8, 6 }, { 5, 7 },
@@ -129,7 +138,7 @@ public class Levels {
 					{ 8, 10 } }
 
 	};
-
+	// Win screen
 	public static final int[][][] YOU_WIN = { {
 			// Y
 			{ 5, 2 }, { 9, 2 }, { 5, 3 }, { 9, 3 }, { 5, 4 }, { 9, 4 }, { 6, 5 }, { 8, 5 }, { 6, 6 }, { 8, 6 },
