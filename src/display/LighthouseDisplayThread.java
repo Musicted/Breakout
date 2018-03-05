@@ -4,18 +4,30 @@ import java.awt.Color;
 
 import logic.GameLogic;
 
+/**
+ * Constructs a 14 by 28 px view of the game state and sends it to the LighthouseDisplay.
+ */
 public class LighthouseDisplayThread extends Thread implements Runnable {
 	
 	private GameLogic gameLogic;
 	private LighthouseDisplay disp;
 	private byte[] px;
 	
+	/**
+	 * Constructor.
+	 * @param g GameLogic object to fetch game state information from
+	 * @param l LighthouseDisplay to send the data to.
+	 */
 	public LighthouseDisplayThread(GameLogic g, LighthouseDisplay l) {
 		gameLogic = g;
 		disp = l;
 		px = new byte[3 * 14 * 28];
 	}
 	
+	/**
+	 * Method called upon thread start.
+	 * Calls all other methods.
+	 */
 	@Override
 	public void run() {
 		dispBlocks();
@@ -24,6 +36,10 @@ public class LighthouseDisplayThread extends Thread implements Runnable {
 		sendData();
 	}
 	
+	/**
+	 * Constructs Block representations.
+	 * Writes into {@code px}
+	 */
 	void dispBlocks() {
 		for (int i = 0; i < 14; i++) {
 			for (int j = 0; j < 14; j++) {
@@ -42,6 +58,10 @@ public class LighthouseDisplayThread extends Thread implements Runnable {
 		}
 	}
 	
+	/**
+	 * Constructs ball representation.
+	 * Writes into {@code px}
+	 */
 	void dispBall() {
 		double ballX = gameLogic.getBallPos().getX();
 		double ballY = gameLogic.getBallPos().getY() + 10;
@@ -54,6 +74,10 @@ public class LighthouseDisplayThread extends Thread implements Runnable {
 		px[ballIndex + 2] = (byte) 255;	
 	}
 	
+	/**
+	 * Constructs paddle representation.
+	 * Writes into {@code px}
+	 */
 	void dispPaddle() {
 		double[] paddleData = gameLogic.getPaddleData();
 		int paddlePos = (int) paddleData[0] / 20;
@@ -66,6 +90,9 @@ public class LighthouseDisplayThread extends Thread implements Runnable {
 		}
 	}
 	
+	/**
+	 * Sends px to its LighthouseDisplay.
+	 */
 	void sendData() {
 		try {
 			disp.send(px);
