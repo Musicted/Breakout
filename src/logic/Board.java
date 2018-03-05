@@ -16,12 +16,6 @@ public class Board {
 			}
 		}
 		
-		for (int col = 0; col < WIDTH; col++) {
-			for (int row = 0; row < 3; row++) {
-				blocks[col][row] = new Block();
-			}
-		}
-		
 	}
 	
 	public Board(int[][] blockAry) {
