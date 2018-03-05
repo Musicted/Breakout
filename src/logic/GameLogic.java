@@ -232,4 +232,8 @@ public class GameLogic {
 	public Block[][] getBlocks() {
 		return board.getBlocks();
 	}
+	
+	public double getBallSize() {
+		return ball.getSize();
+	}
 }

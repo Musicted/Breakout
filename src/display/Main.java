@@ -13,6 +13,8 @@ import util.Vector2d;
 public class Main extends GraphicsProgram {
 	private static final int WIDTH = 560;
 	private static final int HEIGHT = 280;
+	private static final int BLOCK_HEIGHT = 20;
+	private static final int BLOCK_WIDTH = 40;
 	private static final int FPS = 60;
 	private static final long FRAMETIME = 1_000_000_000 / FPS; // nanoseconds
 	private static final int FPS_LH = 30;
@@ -68,7 +70,7 @@ public class Main extends GraphicsProgram {
 
 	public void run() {
 
-		showText(Levels.INTRO);
+//		showText(Levels.INTRO);
 		gameLogic = new GameLogic(0);
 		mainLoop();
 	}
@@ -108,7 +110,6 @@ public class Main extends GraphicsProgram {
 			}
 
 			if (useLighthouse && System.nanoTime() - lastLHFrame > FRAMETIME_LH) {
-//				displayLighthouse();
 				LighthouseDisplayThread t = new LighthouseDisplayThread(gameLogic, disp);
 				t.start();
 				lastLHFrame = System.nanoTime();
@@ -131,7 +132,7 @@ public class Main extends GraphicsProgram {
 		ball.setLocation(ballPos.getX(), ballPos.getY());
 
 		double paddlePos = gameLogic.getPaddleData()[0];
-		paddle.setLocation(paddlePos, HEIGHT - 20);
+		paddle.setLocation(paddlePos, HEIGHT - gameLogic.getPaddleData()[2]);
 
 		Block[][] blocks = gameLogic.getBlocks();
 		for (int col = 0; col < blocks.length; col++) {
@@ -149,74 +150,24 @@ public class Main extends GraphicsProgram {
 
 		for (int col = 0; col < blocks.length; col++) {
 			for (int row = 0; row < blocks[col].length; row++) {
-				blockReps[col][row] = new GRect(col * 40, row * 20, 40, 20);
+				blockReps[col][row] = new GRect(col * BLOCK_WIDTH, row * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
 				blockReps[col][row].setFillColor(Color.BLACK);
 				blockReps[col][row].setFilled(true);
 				add(blockReps[col][row]);
 			}
 		}
 
-		ball = new GRect(-500, -500, 20, 20);
+		ball = new GRect(-500, -500, gameLogic.getBallSize(), gameLogic.getBallSize());
 		ball.setColor(Color.WHITE);
 		ball.setFillColor(Color.WHITE);
 		ball.setFilled(true);
 		add(ball);
 
-		paddle = new GRect(-500, HEIGHT - 20, gameLogic.getPaddleData()[1], 20);
+		paddle = new GRect(-500, HEIGHT - gameLogic.getPaddleData()[2], gameLogic.getPaddleData()[1], gameLogic.getPaddleData()[2]);
 		paddle.setFillColor(Color.WHITE);
 		paddle.setFilled(true);
 		add(paddle);
 
-	}
-
-	private void displayLighthouse() {
-		/* Display the blocks */
-		byte[] px = new byte[3 * 28 * 14];
-		for (int i = 0; i < 14; i++) {
-			for (int j = 0; j < 14; j++) {
-				Color c = gameLogic.getBlocks()[i][j].getColor();
-				byte r = (byte) c.getRed();
-				byte g = (byte) c.getGreen();
-				byte b = (byte) c.getBlue();
-				int first = 6 * i + 3 * 28 * j;
-				px[first] = r;
-				px[first + 3] = r;
-				px[first + 1] = g;
-				px[first + 4] = g;
-				px[first + 2] = b;
-				px[first + 5] = b;
-			}
-		}
-		
-		/* Display the ball */
-		double ballX = gameLogic.getBallPos().getX();
-		double ballY = gameLogic.getBallPos().getY() + 10;
-		int qBallX = (int) ballX / 20;
-		int qBallY = (int) ballY / 20;
-		
-		int ballIndex = 3 * qBallX + 3 * 28 * qBallY;
-		px[ballIndex] = (byte) 255;
-		px[ballIndex + 1] = (byte) 255;
-		px[ballIndex + 2] = (byte) 255;
-		
-		/* Display the paddle */
-		double[] paddleData = gameLogic.getPaddleData();
-		int paddlePos = (int) paddleData[0] / 20;
-		int paddleSize = (int) paddleData[1] / 20;
-		int paddleIndex = (13 * 28 + paddlePos) * 3;
-		for (int i = 0; i < paddleSize; i++) {
-			px[paddleIndex + i * 3] = (byte) 255;
-			px[paddleIndex + i * 3 + 1] = (byte) 255;
-			px[paddleIndex + i * 3 + 2] = (byte) 255;
-		}
-		
-		/* Send the data */
-		try {
-			disp.send(px);
-		} catch (Exception e) {
-			println("Couldn't send data: " + e.getMessage());
-			e.printStackTrace();
-		}
 	}
 	
 	private void displayScreenLighthouse() {
