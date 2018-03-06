@@ -25,6 +25,9 @@ public class Main extends GraphicsProgram {
 	
 	/* Private instance variables */
 	
+	private int vPadding = 0;
+	private int hPadding = 0;
+	
 	private GameLogic gameLogic = new GameLogic();
 	private GRect ball;
 	private GRect paddle;
@@ -32,6 +35,26 @@ public class Main extends GraphicsProgram {
 
 	private boolean useLighthouse = false;
 	private LighthouseDisplay disp;
+	
+	/**
+	 * Default constructor.
+	 */
+	public Main() {
+		super();
+	}
+	
+	/**
+	 * Constructor for use with Strapper.
+	 * Adds an amount of padding to the Applet size because,
+	 * for some reason, it ends up smaller than it should.
+	 * @param hPad horizontal padding
+	 * @param vPad vertical padding
+	 */
+	public Main(int hPad, int vPad) {
+		super();
+		vPadding = vPad;
+		hPadding = hPad;
+	}
 	
 	/**
 	 * Reads settings via user input and initialises ACM and Lighthouse displays and the controller.
@@ -58,7 +81,7 @@ public class Main extends GraphicsProgram {
 			
 		}
 
-		setSize(WIDTH, HEIGHT);
+		setSize(WIDTH + hPadding, HEIGHT + vPadding);
 		addMouseListeners();
 		initGFX();
 	}
