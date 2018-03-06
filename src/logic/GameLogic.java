@@ -163,7 +163,11 @@ public class GameLogic {
 		/* Upper/lower screen borders */
 		// lower border
 		if (ball.getLowerY() > HEIGHT && ball.getSpeed().getY() > 0) {
-			ball.reflectY();
+			try {
+				Thread.sleep(250);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			isRunning = false;
 			lifeCount--;
 			System.out.println("You have " + lifeCount + " lives left.");
