@@ -64,7 +64,7 @@ public class Main extends GraphicsProgram {
 	}
 	
 	/**
-	 * Displays text, or rather a sequence of letters, as block configurations.
+	 * Displays text, or rather a sequence of letters, as block configurations (levels).
 	 * @param text the sequence of blocks to display.
 	 */
 	private void showText(int[][][] text) {

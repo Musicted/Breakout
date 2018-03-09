@@ -1,0 +1,48 @@
+This program implements a version of the game Breakout for display inside an ACM GraphicsProgram, as well as the CAU
+Lighthouse. It does so using the MVC principle, separating the internal model from user input and the multiple
+graphical outputs.
+
+The view, as well as the controller, are implemented by the classes in the display package, the most important of
+which is the aptly named Main class, an extension of ACM's GraphicsProgram. It displays a representation of the
+game's state using its own GCanvas, calls the methods for rendering the game on the Lighthouse, and listens for user
+input, as well as running the game's main timing loop.
+
+The timing loop keeps track of the internal clock and calls three important methods: in every iteration, it calls
+GameLogic's cycle() method, which causes the game state to evolve, supplying it with the number of nanoseconds that
+have passed since the last call. That way, the ball's speed stays constant, no matter how long rendering the field
+may take, or even on which machine the code is run. Every once in a while (60 and 30 times a second, respectively),
+it causes the GCanvas and the Lighthouse displays to update.
+
+The model consists of the various classes in the logic package. All of them are managed by the GameLogic class, and
+only ever accessed by the display classes through the same.
+When a GameLogic is instantiated, it is supplied, either directly or indirectly, with a level to load. It
+instantiates the level's blocks (that the player is supposed to destroy), as well as the ball and paddle. When a
+particular level is over, the GameLogic is destroyed and a new one is instantiated (because who'd ever want to stop
+playing?), typically either the next or the first level, but not always. This is because, in anticipation of having
+to display it on the Lighthouse, we implemented text letters as levels, which the GameLogic is perfectly capable of
+loading without any further modifications.
+The blocks themselves hold only their own color; their position is held by an object of the Board class. Its only
+member is a 14 by 14 2-dimensional Array of type Block. It is notable that it doesn't by design hold null values,
+instead every grid point that doesn't contain a block contains a NoBlock object, the class of which extends the Block
+class. Every NoBlock's color is black, simultaneously providing the backdrop for the two graphical representations.
+
+This program incorporates many of the principles taught in the ProgOO lectures:
+
+First and foremost, it uses object oriented programming. Granted, it can't not use it, seeing as it's written in Java,
+but it does quite strictly apply the core principles of OO programming in that it encapsulates and hides information,
+as seen in the GameLogic class, which is the display and control classes' only gateway into the underlying model. Many
+of the methods we implemented have no purpose other than forwarding calls. There's also inheritance going on, for
+example in the case of the NoBlock class: it can be held in a Block-Array because it extends the Block class. For the
+same reason, out display classes can freely ask any block for its color, because a NoBlock object has the exact same
+getColor() method that a Block object has.
+We also did our best to keep as many field as possible private. Whenever needed, these are accessed by getters, but
+always strictly hierarchical: if the Main class needs a certain block's color, it asks the current GameLogic, which
+asks its Board, which asks the Block.
+We also incorporated the principle of concurrency. Constructing the Lighthouse view takes a surprising amount of time,
+leading to a noticeable drop in performance when playing with the Lighthouse mode enabled. Even more surprising is that
+in earlier builds, our timing system made the game run faster with the Lighthouse view enabled. Because of this, we
+decided to thread the construction of the relevant byte Array.
+The standard control mode, mouse input driven by ACM mouse listeners, is of course an example of event-driven
+programming.
+Some principles from the lectures aren't directly visible in the code, such as the copious amounts of debugging needed
+to make even a small project such as this work as intended.
